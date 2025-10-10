@@ -1,7 +1,7 @@
 from django.db import models
 
 class Product(models.Model):
-    name = models.CharField(max_length=255, help_text="It will be displayed as the product name on the card")
+    title = models.CharField(max_length=255, help_text="It will be displayed as the product name on the card")
     link = models.URLField(help_text="Link to the product page")
     show_for_youtube = models.BooleanField(default=True, verbose_name="Show for YouTube", help_text="If checked, the product will be shown for YouTube domain")
     show_for_tiktok = models.BooleanField(default=True, verbose_name="Show for TikTok", help_text="If checked, the product will be shown for TikTok domain")
@@ -13,7 +13,7 @@ class Product(models.Model):
 
 
     def __str__(self):
-        return self.name
+        return self.title
 
     class Meta:
         ordering = ['-is_pinned',   '-created_at']
