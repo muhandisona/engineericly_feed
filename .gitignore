@@ -1,0 +1,57 @@
+# =========================================
+# Python
+# =========================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================================
+# Virtual Environments
+# =========================================
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# =========================================
+# Django
+# =========================================
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+static/
+.local_settings.py
+vol/
+
+# =========================================
+# Environment
+# =========================================
+.env
+.env.*
+!.env.example
+
+# =========================================
+# IDEs / Editors
+# =========================================
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# =========================================
+# OS Files
+# =========================================
+.DS_Store
+Thumbs.db
+
+# =========================================
+# Migrations (Optional)
+# Uncomment below if you want to ignore migrations
+# **/migrations/*.py
+# !**/migrations/__init__.py

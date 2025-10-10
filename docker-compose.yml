@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: engineericly_feed_web
+    ports:
+      - "8112:8112"
+    volumes:
+      - ./vol:/app/vol
+      - ./db.sqlite3:/app/db.sqlite3
+    restart: unless-stopped
+    env_file:
+      - .env
