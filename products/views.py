@@ -1,9 +1,10 @@
 from pprint import pprint
+from urllib.parse import urlparse
 
 from django.db.models import Q
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from django.utils import timezone
 
 from .models import Product
@@ -27,82 +28,83 @@ def feed_view(request):
 def api_gallery_view(request):
     """API endpoint to get products as JSON with domain-based filtering"""
     try:
-        # Get page parameter, default to 1
-        page = int(request.GET.get('page', 1))
-        
-        # Get domain from referrer, origin, host header, or query parameter (for testing)
-        domain = request.GET.get('domain')  # Allow manual domain override for testing
-        
+        # Get and validate page parameter
+        try:
+            page = int(request.GET.get('page', 1))
+        except ValueError:
+            page = 1
+
+        # Determine domain (query param > referrer > origin > host)
+        domain = request.GET.get('domain')
         if not domain:
-            referrer = request.META.get('HTTP_REFERER', '')
-            origin = request.META.get('HTTP_ORIGIN', '')
-            host = request.META.get('HTTP_HOST', '')
-            
-            # Check referrer first, then origin, then host
-            if referrer:
-                domain = referrer
-            elif origin:
-                domain = origin
-            elif host:
-                domain = host
-        
-        # Start with all products
+            domain = (
+                request.META.get('HTTP_REFERER')
+                or request.META.get('HTTP_ORIGIN')
+                or request.META.get('HTTP_HOST')
+                or ''
+            )
+
+        # Extract only the hostname (e.g., instagram.com)
+        parsed = urlparse(domain)
+        hostname = parsed.hostname or domain.lower()
+
+        # Filter products by publish time
         now = timezone.now()
         products = Product.objects.filter(
             Q(published_at__isnull=True) | Q(published_at__lte=now)
         )
-        
-        # Filter based on domain
-        if domain:
-            domain_lower = domain.lower()
-            
+
+        # Domain-specific filtering
+        if hostname:
+            domain_lower = hostname.lower()
             if 'instagram' in domain_lower:
-                # Show only products marked for Instagram
                 products = products.filter(show_for_instagram=True)
             elif 'youtube' in domain_lower or 'youtu.be' in domain_lower:
-                # Show only products marked for YouTube
                 products = products.filter(show_for_youtube=True)
             elif 'tiktok' in domain_lower:
-                # Show only products marked for TikTok
                 products = products.filter(show_for_tiktok=True)
-            # If domain doesn't match any known platform, show all products
-        
-        # Order by pinned status and creation date
-        products = products.order_by('-is_pinned', '-created_at')
-        
+            # else: show all
+
+        # Apply model-defined ordering
+        products = products.order_by('-is_pinned', 'order', '-published_at')
+
         # Paginate results
-        paginator = Paginator(products, 12)  # 12 items per page
-        page_obj = paginator.get_page(page)
-        
+        paginator = Paginator(products, 12)
+        try:
+            page_obj = paginator.page(page)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
         # Prepare response data
-        items = []
-        for product in page_obj:
-            items.append({
-                'id': product.id,
-                'title': product.title,
-                'link': product.link,
-                'file_link': product.file.url if product.file else '',
-                'show_for_youtube': product.show_for_youtube,
-                'show_for_tiktok': product.show_for_tiktok,
-                'show_for_instagram': product.show_for_instagram,
-                'is_pinned': product.is_pinned,
-                'created_at': product.created_at.isoformat(),
-                'updated_at': product.updated_at.isoformat(),
-            })
-        pprint(items)
+        items = [
+            {
+                'id': p.id,
+                'title': p.title,
+                'link': p.link,
+                'file_link': p.file.url if p.file else '',
+                'show_for_youtube': p.show_for_youtube,
+                'show_for_tiktok': p.show_for_tiktok,
+                'show_for_instagram': p.show_for_instagram,
+                'is_pinned': p.is_pinned,
+                'created_at': p.created_at.isoformat(),
+                'updated_at': p.updated_at.isoformat(),
+            }
+            for p in page_obj
+        ]
+
         response_data = {
             'items': items,
-            'page': page,
+            'page': page_obj.number,
             'has_next': page_obj.has_next(),
             'has_previous': page_obj.has_previous(),
             'total_pages': paginator.num_pages,
             'total_items': paginator.count,
         }
-        
+
         return JsonResponse(response_data)
-        
+
     except Exception as e:
-        return JsonResponse({
-            'error': 'Failed to fetch products',
-            'details': str(e)
-        }, status=500)
+        return JsonResponse(
+            {'error': 'Failed to fetch products', 'details': str(e)},
+            status=500,
+        )

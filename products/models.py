@@ -26,5 +26,8 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if self.order is None:
             last_product = Product.objects.order_by('-order').first()
-            self.order = (last_product.order + 1) if last_product else 1
+            last_order = 0
+            if last_product and last_product.order:
+                last_order = last_product.order
+            self.order = last_order + 1
         super().save(*args, **kwargs)
