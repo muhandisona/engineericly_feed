@@ -1,8 +1,11 @@
 from pprint import pprint
 
+from django.db.models import Q
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.paginator import Paginator
+from django.utils import timezone
+
 from .models import Product
 import json
 
@@ -44,7 +47,8 @@ def api_gallery_view(request):
                 domain = host
         
         # Start with all products
-        products = Product.objects.all()
+        now = timezone.now()
+        products = Product.objects.filter(Q(Q(published_at__isnull=True) | Q(published_at__lte=now)))
         
         # Filter based on domain
         if domain:
