@@ -49,7 +49,7 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-is_pinned', 'order', '-published_at']
+        ordering = ['-is_pinned', '-order', '-published_at']
         verbose_name = "Product"
         verbose_name_plural = "Products"
 
