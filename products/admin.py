@@ -24,7 +24,7 @@ class ProductAdmin(ModelAdmin):
         (None, {'fields': ('title', 'link', 'is_pinned', 'order')}),
         ("Social Media", {'fields': ('show_for_youtube', 'show_for_tiktok', 'show_for_instagram')}),
         ("File", {'fields': ('file',)}),
-        ('Timestamps', {'fields': ('published_at', 'created_at', 'updated_at'), 'classes': ('collapse',)}),
+        ('Timestamps', {'fields': ('published_at', 'created_at', 'updated_at')}),
     )
     add_fieldsets = (
         (None, {'fields': ('title', 'link', 'is_pinned', 'order')}),

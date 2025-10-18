@@ -48,7 +48,9 @@ def api_gallery_view(request):
         
         # Start with all products
         now = timezone.now()
-        products = Product.objects.filter(Q(Q(published_at__isnull=True) | Q(published_at__lte=now)))
+        products = Product.objects.filter(
+            Q(published_at__isnull=True) | Q(published_at__lte=now)
+        )
         
         # Filter based on domain
         if domain:
