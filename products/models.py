@@ -30,4 +30,6 @@ class Product(models.Model):
             if last_product and last_product.order:
                 last_order = last_product.order
             self.order = last_order + 1
+        if self.published_at is None:
+            self.published_at = timezone.now()
         super().save(*args, **kwargs)
