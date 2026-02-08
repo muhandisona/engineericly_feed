@@ -1,18 +1,18 @@
+name: engineericly-feed
+
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
+    # Use the image built by GitHub Actions
+    image: ghcr.io/muhandisona/engineericly_feed:latest
     container_name: engineericly_feed_web
     ports:
       - "8112:8112"
     volumes:
-      - ./vol:/app/vol
-      - ./db.sqlite3:/app/db.sqlite3
+      # Map to actual folders on your NAS for persistence
+      - /mnt/pool_one/apps/engineericly/vol:/app/vol
+      - /mnt/pool_one/apps/engineericly/db.sqlite3:/app/db.sqlite3
     restart: unless-stopped
     env_file:
       - .env
-    networks:
-      - default
-      - nginx-net
+    # Removed the nginx-net requirement unless you manually created that network in Docker.
+    # Nginx Proxy Manager handles the connection via the NAS IP, so this isn't strictly needed.
