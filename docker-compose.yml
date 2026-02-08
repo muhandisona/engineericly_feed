@@ -16,8 +16,3 @@ services:
     networks:
       - default
       - nginx-net
-
-
-networks:
-  nginx-net:
-    external: true
