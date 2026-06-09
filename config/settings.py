@@ -180,15 +180,15 @@ UNFOLD = {
         "show_all_applications": False,  # Dropdown with all applications and models
         "navigation": [
             {
-                "title": "Products",
+                "title": "Post Links",
                 "separator": False,  # Top border
                 "collapsible": False,  # Collapsible group of links
                 "items": [
                     {
-                        "title": "Products",
-                        "icon": "flag",
-                        "link": reverse_lazy("admin:products_product_changelist"),
-                        "permission": lambda request: request.user.has_perm("products.add_products"),
+                        "title": "Post Links",
+                        "icon": "inventory_2",
+                        "link": reverse_lazy("admin:products_postlink_changelist"),
+                        "permission": lambda request: request.user.has_perm("products.add_postlink"),
                     },
                 ],
             },
