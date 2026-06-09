@@ -147,20 +147,17 @@ body {
   gap: 28px;
 }
 
-/* Make featured item larger */
+/* Make featured item stand out without breaking portrait grid */
 .card-item.featured {
-  grid-column: span 2;
-  grid-row: span 2;
+  /* Removed grid-column span so it stays 1 column wide like a TikTok profile */
+  position: relative;
+  z-index: 2;
 }
 
 @media (max-width: 992px) {
   .masonry-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
-  }
-  .card-item.featured {
-    grid-column: span 2;
-    grid-row: span 1;
   }
   .site-title {
     font-size: 36px;
@@ -169,12 +166,8 @@ body {
 
 @media (max-width: 576px) {
   .masonry-grid {
-    grid-template-columns: repeat(1, 1fr);
-    gap: 16px;
-  }
-  .card-item.featured {
-    grid-column: span 1;
-    grid-row: span 1;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
   .gallery-container {
     padding: 0 16px;
@@ -255,18 +248,13 @@ body {
 .card-image-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 100%; /* Square aspect ratio by default */
+  padding-top: 133.33%; /* 3:4 Portrait aspect ratio perfect for Reels/Shorts */
   overflow: hidden;
 }
 
+/* Featured image keeps the same portrait ratio */
 .card-item.featured .card-image-wrapper {
-  padding-top: 50%; /* Widescreen aspect ratio for featured */
-}
-
-@media (max-width: 992px) {
-  .card-item.featured .card-image-wrapper {
-    padding-top: 75%;
-  }
+  padding-top: 133.33%;
 }
 
 .card-image {
