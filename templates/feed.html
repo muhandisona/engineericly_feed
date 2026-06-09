@@ -93,11 +93,23 @@
             }
         }
 
-        function createCard(item) {
+        function createCard(item, isFeatured) {
+            const featuredClass = isFeatured ? 'featured' : '';
+            const badge = isFeatured ? `<div class="featured-badge"><i class="fas fa-star"></i> Latest Video Item</div>` : '';
+
             return `
-                <div class="card-item">
+                <div class="card-item ${featuredClass}">
                     <a href="${item.link}" class="card-link" target="_blank">
-                        <img src="${item.file_link}" alt="${item.title || '3D Printable Model'}" class="card-image" loading="lazy">
+                        ${badge}
+                        <div class="card-image-wrapper">
+                            <img src="${item.file_link}" alt="${item.title || '3D Model'}" class="card-image" loading="lazy">
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">${item.title}</h3>
+                            <div class="card-subtitle">
+                                <span>View Link</span> <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
                     </a>
                 </div>
             `;
@@ -138,8 +150,9 @@
 
                 // Render items
                 const gallery = document.getElementById('gallery');
-                data.items.forEach(item => {
-                    const card = createCard(item);
+                data.items.forEach((item, index) => {
+                    const isFeatured = (data.page === 1 && index === 0);
+                    const card = createCard(item, isFeatured);
                     gallery.insertAdjacentHTML('beforeend', card);
                 });
 

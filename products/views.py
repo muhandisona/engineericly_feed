@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage
 from django.utils import timezone
 
-from .models import Product
+from .models import PostLink
 import json
 
 def feed_view(request):
@@ -26,7 +26,7 @@ def feed_view(request):
     return render(request, 'feed.html', context)
 
 def api_gallery_view(request):
-    """API endpoint to get products as JSON with domain-based filtering"""
+    """API endpoint to get post links as JSON with domain-based filtering"""
     try:
         # Get and validate page parameter
         try:
@@ -48,9 +48,9 @@ def api_gallery_view(request):
         parsed = urlparse(domain)
         hostname = parsed.hostname or domain.lower()
 
-        # Filter products by publish time
+        # Filter post links by publish time
         now = timezone.now()
-        products = Product.objects.filter(
+        post_links = PostLink.objects.filter(
             Q(published_at__isnull=True) | Q(published_at__lte=now)
         )
 
@@ -58,18 +58,18 @@ def api_gallery_view(request):
         if hostname:
             domain_lower = hostname.lower()
             if 'instagram' in domain_lower:
-                products = products.filter(show_for_instagram=True)
+                post_links = post_links.filter(show_for_instagram=True)
             elif 'youtube' in domain_lower or 'youtu.be' in domain_lower:
-                products = products.filter(show_for_youtube=True)
+                post_links = post_links.filter(show_for_youtube=True)
             elif 'tiktok' in domain_lower:
-                products = products.filter(show_for_tiktok=True)
+                post_links = post_links.filter(show_for_tiktok=True)
             # else: show all
 
         # Apply model-defined ordering
-        products = products.order_by('-is_pinned', 'order', '-published_at')
+        # (This automatically uses Meta.ordering: ['-is_pinned', '-order', '-published_at'])
 
         # Paginate results
-        paginator = Paginator(products, 12)
+        paginator = Paginator(post_links, 12)
         try:
             page_obj = paginator.page(page)
         except EmptyPage:
@@ -105,6 +105,6 @@ def api_gallery_view(request):
 
     except Exception as e:
         return JsonResponse(
-            {'error': 'Failed to fetch products', 'details': str(e)},
+            {'error': 'Failed to fetch post links', 'details': str(e)},
             status=500,
         )

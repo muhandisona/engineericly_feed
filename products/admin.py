@@ -8,8 +8,8 @@ from products.widgets import CustomUnfoldAdminImageFieldWidget
 from products.models import *
 
 
-@admin.register(Product)
-class ProductAdmin(ModelAdmin):
+@admin.register(PostLink)
+class PostLinkAdmin(ModelAdmin):
     list_display = ('title', 'is_pinned', 'order', 'published_at')
     list_display_links = ('title', 'is_pinned', 'order', 'published_at')
     search_fields = ('title', 'link')
